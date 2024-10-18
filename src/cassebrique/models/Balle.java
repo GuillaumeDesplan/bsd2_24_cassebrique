@@ -21,7 +21,10 @@ public class Balle extends Rond {
     }
 
     public Balle(int x, int y, int vitesseX, int vitesseY) {
-        this(x, y, vitesseX, vitesseY, Color.GREEN);
+        this(x, y, vitesseX, vitesseY, new Color(
+                (float) Math.random(),
+                (float) Math.random(),
+                (float) Math.random()));  // Couleur aléatoire
     }
 
     public boolean collisionAvecBrique(Brique brique) {
@@ -31,10 +34,11 @@ public class Balle extends Rond {
                 y <= brique.getY() + Brique.hauteurDefaut);
     }
 
-    public void deplacer(Barre barre, ArrayList<Brique> listeBrique) {
+    public void deplacer(Barre barre, ArrayList<Brique> listeBrique, ArrayList<Bonus> listeBonus) {
         x += vitesseX;
         y += vitesseY;
 
+        // Gestion des collisions avec les bords de la fenêtre
         if (x >= CasseBrique.LARGEUR - diametre || x <= 0) {
             vitesseX = -vitesseX;
         }
@@ -42,26 +46,37 @@ public class Balle extends Rond {
             vitesseY = -vitesseY;
         }
 
+        // Collision avec la barre
         if (y + diametre >= barre.getY() &&
                 x + diametre >= barre.getX() &&
                 x <= barre.getX() + Barre.largeurDefaut) {
             vitesseY = -vitesseY;
         }
 
+        // Gestion des collisions avec les briques
         for (int i = 0; i < listeBrique.size(); i++) {
             Brique brique = listeBrique.get(i);
             if (collisionAvecBrique(brique)) {
                 vitesseY = -vitesseY;
-                brique.diminuerResistance();
-
+                brique.diminuerResistance();  // Réduit la résistance de la brique
 
                 if (brique.getResistance() <= 0) {
-                    listeBrique.remove(i);
+                    listeBrique.remove(i);  // Supprime la brique cassée
+
+                    // Génère un bonus avec une chance de 10%
+                    if (Math.random() < 0.1) {
+                        Bonus bonus = new Bonus(
+                                brique.getX() + Brique.largeurDefaut / 2,
+                                brique.getY()
+                        );
+                        listeBonus.add(bonus);  // Ajout du bonus à la liste
+                    }
                 }
-                break;
+                break;  // Stoppe la vérification après une collision
             }
         }
 
+        // Gestion des collisions avec le bas de la fenêtre
         if (y >= CasseBrique.HAUTEUR - diametre) {
             vitesseY = -vitesseY;
         }
