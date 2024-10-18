@@ -1,5 +1,7 @@
 package cassebrique.models;
 
+import cassebrique.CasseBrique;
+
 import java.awt.*;
 
 public class Barre extends Rectangle {
@@ -15,10 +17,18 @@ public class Barre extends Rectangle {
 
     public void deplacementDroite() {
         this.x += this.vitesse;
+
+        if(this.x > CasseBrique.LARGEUR - largeur) {
+            this.x = CasseBrique.LARGEUR - largeur;
+        }
     }
 
     public void deplacementGauche() {
         this.x -= this.vitesse;
+
+        if (this.x < 0){
+            this.x = 0;
+        }
     }
 
     public int getVitesse() {
