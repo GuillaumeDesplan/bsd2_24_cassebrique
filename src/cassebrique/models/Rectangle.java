@@ -1,6 +1,8 @@
 package cassebrique.models;
 
 import java.awt.*;
+import java.util.ArrayList;
+
 
 public class Rectangle extends Sprite {
 

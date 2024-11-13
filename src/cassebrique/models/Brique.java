@@ -4,29 +4,18 @@ import java.awt.*;
 
 public class Brique extends Rectangle {
 
-    public static final int hauteurDefaut = 40;
-    public static final int largeurDefaut = 70;
+    protected int resistance;
+    public static int hauteurDefaut = 40;
+    public static int largeurDefaut = 70;
 
-    private int resistance;
-
-    public Brique(int x, int y, Color cyan) {
-        super(x, y, largeurDefaut, hauteurDefaut, Color.CYAN);
-        this.resistance = 3;
+    public Brique(int x, int y, Color couleur, int resistance) {
+        super(x, y, largeurDefaut, hauteurDefaut , couleur);
+        this.resistance = resistance;
     }
 
-    public void mettreAJourCouleur() {
-        switch (resistance) {
-            case 2 -> setCouleur(Color.ORANGE);
-            case 1 -> setCouleur(Color.RED);
-            default -> setCouleur(Color.CYAN);
-        }
-    }
-
-    public void diminuerResistance() {
-        if (resistance > 0) {
-            resistance--;
-            mettreAJourCouleur();
-        }
+    public Brique(int x, int y, Color couleur) {
+        super(x, y, largeurDefaut, hauteurDefaut , couleur);
+        this.resistance = 1;
     }
 
     public int getResistance() {
@@ -35,6 +24,5 @@ public class Brique extends Rectangle {
 
     public void setResistance(int resistance) {
         this.resistance = resistance;
-        mettreAJourCouleur();
     }
 }

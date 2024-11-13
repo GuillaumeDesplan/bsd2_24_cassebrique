@@ -1,85 +1,131 @@
 package cassebrique.models;
 
 import cassebrique.CasseBrique;
+
 import java.awt.*;
 import java.util.ArrayList;
 
-public class Balle extends Rond {
+public class Balle extends Sprite {
 
     protected int vitesseX;
     protected int vitesseY;
-    private int collisions;
+    protected int diametre = 20;
+
+    public Balle() {
+        super();
+        this.x = this.nombreAleatoire(diametre,CasseBrique.LARGEUR - diametre);
+        this.y = this.nombreAleatoire(400,500);
+        this.vitesseX = 3;
+        this.vitesseY = -3;
+        this.couleur = new Color(ratioAleatoire(), ratioAleatoire(), ratioAleatoire(0.4f,0.7f));
+    }
+
+    public Balle(int x, int y, int vitesseX, int vitesseY) {
+        this.x = x;
+        this.y = y;
+        this.vitesseX = vitesseX;
+        this.vitesseY = vitesseY;
+        this.couleur = new Color(ratioAleatoire(), ratioAleatoire(), ratioAleatoire(0.4f,0.7f));
+    }
 
     public Balle(int x, int y, int vitesseX, int vitesseY, Color couleur) {
-        super();
         this.x = x;
         this.y = y;
         this.vitesseX = vitesseX;
         this.vitesseY = vitesseY;
         this.couleur = couleur;
-        this.collisions = 0;
     }
 
-    public Balle(int x, int y, int vitesseX, int vitesseY) {
-        this(x, y, vitesseX, vitesseY, new Color(
-                (float) Math.random(),
-                (float) Math.random(),
-                (float) Math.random()));  // Couleur aléatoire
-    }
+    public Collision detecteCollision(ArrayList<Rectangle> listeRectangle) {
+        int x1Balle = x;
+        int x2Balle = x + diametre;
+        int y1Balle = y;
+        int y2Balle =y + diametre;
 
-    public boolean collisionAvecBrique(Brique brique) {
-        return (x + diametre >= brique.getX() &&
-                x <= brique.getX() + Brique.largeurDefaut &&
-                y + diametre >= brique.getY() &&
-                y <= brique.getY() + Brique.hauteurDefaut);
-    }
+        for (Rectangle rectangle : listeRectangle) {
+            int x1Rectangle = rectangle.x;
+            int x2Rectangle = rectangle.x + rectangle.largeur;
+            int y1Rectangle = rectangle.y;
+            int y2Rectangle =rectangle.y + rectangle.hauteur;
 
-    public void deplacer(Barre barre, ArrayList<Brique> listeBrique, ArrayList<Bonus> listeBonus) {
-        x += vitesseX;
-        y += vitesseY;
+            //est ce que l'un des coin de la balle se trouve dans le Rectangle testé
+            if((x1Balle > x1Rectangle && x1Balle < x2Rectangle && y1Balle > y1Rectangle && y1Balle < y2Rectangle)
+                    || (x2Balle > x1Rectangle && x2Balle < x2Rectangle && y1Balle > y1Rectangle && y1Balle < y2Rectangle)
+                    || (x1Balle > x1Rectangle && x1Balle < x2Rectangle && y2Balle > y1Rectangle && y2Balle < y2Rectangle)
+                    || (x2Balle > x1Rectangle && x2Balle < x2Rectangle && y2Balle > y1Rectangle && y2Balle < y2Rectangle)){
+                // il y a une collision
+                int distanceDroite = Math.abs(x2Balle - x1Rectangle);
+                int distanceGauche = Math.abs(x1Balle - x2Rectangle);
+                int distanceHaut = Math.abs(y1Balle - y2Rectangle);
+                int distanceBas = Math.abs(y2Balle - y1Rectangle);
 
-        // Gestion des collisions avec les bords de la fenêtre
-        if (x >= CasseBrique.LARGEUR - diametre || x <= 0) {
-            vitesseX = -vitesseX;
-        }
-        if (y <= 0) {
-            vitesseY = -vitesseY;
-        }
+                int plusPetiteDistance = Math.min(
+                        distanceDroite,Math.min(
+                                distanceGauche,Math.min(
+                                        distanceHaut,distanceBas)));
 
-        // Collision avec la barre
-        if (y + diametre >= barre.getY() &&
-                x + diametre >= barre.getX() &&
-                x <= barre.getX() + Barre.largeurDefaut) {
-            vitesseY = -vitesseY;
-        }
-
-        // Gestion des collisions avec les briques
-        for (int i = 0; i < listeBrique.size(); i++) {
-            Brique brique = listeBrique.get(i);
-            if (collisionAvecBrique(brique)) {
-                vitesseY = -vitesseY;
-                brique.diminuerResistance();  // Réduit la résistance de la brique
-
-                if (brique.getResistance() <= 0) {
-                    listeBrique.remove(i);  // Supprime la brique cassée
-
-                    // Génère un bonus avec une chance de 10%
-                    if (Math.random() < 0.1) {
-                        Bonus bonus = new Bonus(
-                                brique.getX() + Brique.largeurDefaut / 2,
-                                brique.getY()
-                        );
-                        listeBonus.add(bonus);  // Ajout du bonus à la liste
-                    }
+                if(plusPetiteDistance == distanceDroite) {
+                    return new Collision(rectangle, "droite");
+                } else if(plusPetiteDistance == distanceGauche) {
+                    return new Collision(rectangle, "gauche");
+                } else if(plusPetiteDistance == distanceHaut) {
+                    return new Collision(rectangle, "haut");
+                } else  {
+                    return new Collision(rectangle, "bas");
                 }
-                break;  // Stoppe la vérification après une collision
             }
         }
 
-        // Gestion des collisions avec le bas de la fenêtre
-        if (y >= CasseBrique.HAUTEUR - diametre) {
+        return null;
+    }
+
+    protected float ratioAleatoire(float min, float max) {
+        return (float)Math.random() * (max - min) + min;
+    }
+
+    protected float ratioAleatoire() {
+        //return (float)Math.random() * 0.6f + 0.2f;
+        return ratioAleatoire(0.2f, 0.8f);
+    }
+
+    protected int nombreAleatoire(int min, int max) {
+        return (int)(Math.random() * (max - min) + min);
+    }
+
+    public void deplacer() {
+
+        x += vitesseX;
+        y += vitesseY;
+
+        if(x >= CasseBrique.LARGEUR - diametre || x <= 0) {
+            vitesseX = -vitesseX;
+        }
+
+        if(y >= CasseBrique.HAUTEUR - diametre || y <= 0) {
             vitesseY = -vitesseY;
         }
+    }
+
+    public void dessiner(Graphics2D dessin) {
+        dessin.setColor(couleur);
+        dessin.fillOval(x,y,diametre,diametre);
+    }
+
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
     }
 
     public int getVitesseX() {
@@ -96,6 +142,14 @@ public class Balle extends Rond {
 
     public void setVitesseY(int vitesseY) {
         this.vitesseY = vitesseY;
+    }
+
+    public int getDiametre() {
+        return diametre;
+    }
+
+    public void setDiametre(int diametre) {
+        this.diametre = diametre;
     }
 
     public Color getCouleur() {

@@ -1,7 +1,5 @@
 package cassebrique.models;
 
-import cassebrique.CasseBrique;
-
 import java.awt.*;
 
 public class Barre extends Rectangle {
@@ -17,36 +15,11 @@ public class Barre extends Rectangle {
 
     public void deplacementDroite() {
         this.x += this.vitesse;
-
-        if(this.x > CasseBrique.LARGEUR - largeur) {
-            this.x = CasseBrique.LARGEUR - largeur;
-        }
     }
 
     public void deplacementGauche() {
         this.x -= this.vitesse;
-
-        if (this.x < 0){
-            this.x = 0;
-        }
     }
-
-    public void augmenterTaille() {
-        largeurDefaut += 20;  // Augmenter la taille de la barre
-    }
-
-    public void diminuerTaille() {
-        largeurDefaut = Math.max(50, largeurDefaut - 20);  // Diminuer la taille sans aller sous 50
-    }
-
-    public void augmenterVitesse() {
-        vitesse += 2;  // Augmenter la vitesse de déplacement
-    }
-
-    public void diminuerVitesse() {
-        vitesse = Math.max(2, vitesse - 2);  // Diminuer la vitesse sans aller sous 2
-    }
-
 
     public int getVitesse() {
         return vitesse;
