@@ -13,7 +13,6 @@ public class CasseBrique extends Canvas implements KeyListener {
     public ArrayList<Balle> listeBalle = new ArrayList<>();
     public ArrayList<Brique> listeBrique = new ArrayList<>();
     public ArrayList<Bonus> listeBonus = new ArrayList<>();
-    public ArrayList<Sprite> listeSprite = new ArrayList<>();
     public Barre barre;
 
     public static final int LARGEUR = 500;
@@ -49,15 +48,9 @@ public class CasseBrique extends Canvas implements KeyListener {
         listeBalle = new ArrayList<>();
         listeBalle.add(new Balle(100, 500, 3, 4, Color.magenta));
 
-        listeSprite.add(listeBalle.get(0));
-        listeSprite.add(listeBalle.get(2));
-        listeSprite.add(listeBalle.get(3));
-
         barre = new Barre(
                 CasseBrique.LARGEUR / 2 - Barre.largeurDefaut / 2,
                 CasseBrique.HAUTEUR - 100);
-
-        listeSprite.add(barre);
 
         listeBrique = new ArrayList<>();
         for (int indexLigne = 0; indexLigne < 5; indexLigne++) {
@@ -67,7 +60,6 @@ public class CasseBrique extends Canvas implements KeyListener {
                         indexLigne * (Brique.hauteurDefaut + 2),
                         Color.cyan);
                 listeBrique.add(brique);
-                listeSprite.add(brique);
             }
         }
 
@@ -86,8 +78,8 @@ public class CasseBrique extends Canvas implements KeyListener {
             if (toucheGauche) barre.deplacementGauche();
             barre.dessiner(dessin);
 
-            for (Sprite sprite : listeSprite) {
-                sprite.dessiner(dessin);
+            for (Brique brique : listeBrique) {
+                brique.dessiner(dessin);
             }
 
             for (int i = 0; i < listeBonus.size(); i++) {
